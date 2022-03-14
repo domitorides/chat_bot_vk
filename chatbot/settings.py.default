@@ -1,0 +1,106 @@
+
+TOKEN = ''
+GROUP_ID =
+
+CITYS = ['Санкт-Петербург', 'Токио', 'Лондон', 'Абакан', 'Новосибирск']
+
+INTENTS = [
+    {
+        "name": "Справка о работе бота",
+        "tokens": "/help",
+        "scenario": None,
+        "answer": "Данный бот заказывает билеты на самолёты, для покупки билетов пропишите /ticket"
+    },
+    {
+        "name": "Заказ билетов",
+        "tokens": "/ticket",
+        "scenario": "booking_tickets",
+        "answer": None
+    }
+]
+
+SCENARIOS = {
+    "booking_tickets": {
+        "first_step": "step1",
+        "steps": {
+            "step1": {
+                "text": "Введите город отправления",
+                "failure_text": f"Такого города не найдено, есть вот такие города для перелёта: {', '.join(CITYS)}",
+                "handler": "handler_city_from",
+                "next_step": "step2"
+            },
+            "step2": {
+                "text": "Введите город прилёта",
+                "failure_text": f"Такого города не найдено, есть вот такие города для перелёта: {', '.join(CITYS)}",
+                "failure_text_noway": "Между городами нет  рейсов, попробуйте ещё раз, введя команду /ticket!",
+                "handler": "handler_city_to",
+                "next_step": "step3"
+            },
+            "step3": {
+                "text": "Введите дату вылета в формате dd-mm-yy",
+                "failure_text": "Дата введена неверно, проверьте правильность введённой даты и повторите попытку",
+                "handler": "handler_data",
+                "next_step": "step4"
+            },
+            "step4": {
+                "text": "Выберите наиболее удобный рейс и введите его номер: {flights}",
+                "failure_text": "Такого по счёту номера рейса нет, повторите попытку",
+                "handler": "handler_number",
+                "next_step": "step5"
+            },
+            "step5": {
+                "text": "Укажите количество мест (от 1 до 5)",
+                "failure_text": "Неправильное количество мест, повторите ввод",
+                "handler": "handler_places",
+                "next_step": "step6"
+            },
+            "step6": {
+                "text": "Успешно! Если у вас есть какие-либо пожелания, напишите о них, если нет - просто ответьте нет:",
+                "failure_text": None,
+                "handler": "handler_comment",
+                "next_step": "step7"
+            },
+            "step7": {
+                "text": "Проверьте введённые данные, если верно - ответьте да, если неверно - нет:"
+                        "\nДата: {date_user} Время: {time_user}, Рейс: {number_user}\n"
+                        "Количество мест: {places}\n"
+                        "Ваш комментарий: {comment_user}",
+                "failure_text": "Неправильный ответ, повторите ввод",
+                "handler": "handler_check",
+                "next_step": "step8"
+            },
+            "step8": {
+                "text": "Введите номер телефона в таком формате: +7 или 8 и далее все цифры без пробела",
+                "failure_text": "Номер указан неверно, повторите ввод",
+                "handler": "handler_tel_number",
+                "next_step": "step9"
+            },
+            "step9": {
+                "text": "Билеты куплены, с вами свяжутся для подтверждения по введённому номеру телефона",
+                "image": "generate_ticket_handler",
+                "failure_text": None,
+                "handler": None,
+                "next_step": None
+            },
+        }
+    }
+}
+
+FLIGHTS = [
+    {'city_from': 'Лондон', 'city_to': 'Токио', "date": "10 20", "date_time": "11:40", "number": "132340"},
+    {'city_from': 'Лондон', 'city_to': 'Токио', "date": "Friday", "date_time": "15:40", "number": "132323"},
+    {'city_from': 'Лондон', 'city_to': 'Токио', "date": "Sunday", "date_time": "13:20", "number": "453256"},
+    {'city_from': 'Лондон', 'city_to': 'Санкт-Петербург', "date": "Sunday Monday", "date_time": "16:40", "number": "839516"},
+    {'city_from': 'Абакан', 'city_to': 'Санкт-Петербург', "date": "25", "date_time": "6:40", "number": "143256"},
+    {'city_from': 'Абакан', 'city_to': 'Новосибирск', "date": "Friday", "date_time": "20:35", "number": "252156"}
+]
+
+
+DEFAULT_ANSWER = "Вы можете ввести команды /ticket - для заказа билетов или /help - для справочной информации"
+
+DB_CONFIG = dict(
+    provider='postgres',
+    user='postgres',
+    host='localhost',
+    database='vk_chat_bot'
+)
